@@ -80,7 +80,6 @@ namespace Product_Catalog_Web_Application.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveNewProduct(ProductViewModel newProduct)
         {
             if (ModelState.IsValid)

@@ -7,6 +7,7 @@ using Product_Catalog_Web_Application.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 
@@ -31,28 +32,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireLowercase = false;
 }).AddEntityFrameworkStores<Context>();
 
-builder.Services.AddAuthentication(options =>
-{
-    // convert from cookies to JWT
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    //  return unauthrized for user  have not token need access endpoint 
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"]))
-    };
 
-});
 //resolve from root
 var app = builder.Build();
 
@@ -79,7 +60,7 @@ app.UseHttpsRedirection();
         app.UseStaticFiles();
        
         app.UseRouting();
-
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllerRoute(

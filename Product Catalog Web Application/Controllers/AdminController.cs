@@ -5,6 +5,9 @@ using Product_Catalog_Web_Application.ViewModel;
 using Microsoft.AspNetCore.Hosting;
 using Product_Catalog_Web_Application.Helper;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
+using NuGet.Common;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Product_Catalog_Web_Application.Controllers
 {
@@ -92,7 +95,14 @@ namespace Product_Catalog_Web_Application.Controllers
                 NewobjProduct.Name = newProduct.Name;
                 NewobjProduct.CategoryId = newProduct.CategoryId;
                 NewobjProduct.duration = (newProduct.EndDate - newProduct.StartDate).ToString();
-                NewobjProduct.UserId = "c4a06a44-06d2-4beb-8707-0afd51984cb1";
+
+                var authorizationHeader = Request.Headers["Authorization"].ToString();
+                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(token);
+
+                // Extract the 'userId' from the claim
+                NewobjProduct.UserId = jwtToken.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
                 //save Image
                 var upload_image = new UploadImage(hosting);
                 string Upload = await upload_image.Upload(newProduct);

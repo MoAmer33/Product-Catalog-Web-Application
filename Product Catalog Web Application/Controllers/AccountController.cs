@@ -7,6 +7,8 @@ using Product_Catalog_Web_Application.Helper;
 using Product_Catalog_Web_Application.Models;
 using Product_Catalog_Web_Application.ViewModel;
 using System.Configuration;
+using System.Data;
+using System.Security.Claims;
 
 namespace Product_Catalog_Web_Application.Controllers
 {
@@ -18,14 +20,16 @@ namespace Product_Catalog_Web_Application.Controllers
         private readonly IProduct product;
         private readonly IConfiguration _config;
         private readonly ILogger<AccountController> _logger;
+        private readonly SignInManager<ApplicationUser> signInManager;
         public AccountController(UserManager<ApplicationUser> userManager,IConfiguration configuration,
-            ICategory category, IProduct product, ILogger<AccountController> logger)
+            ICategory category, IProduct product, ILogger<AccountController> logger, SignInManager<ApplicationUser> signInManager)
         {
             this._userManager = userManager;
             this._config = configuration;
             this.category = category;
             this.product = product;
-            _logger = logger;
+            this._logger = logger;
+            this.signInManager = signInManager;
         }
 
         public async Task<IActionResult> Show(string CategoryId)
@@ -64,11 +68,8 @@ namespace Product_Catalog_Web_Application.Controllers
                 IdentityResult result = await _userManager.CreateAsync(myuser, user.Password);
                 if (result.Succeeded)
                 {
-                    IdentityResult check= await _userManager.AddToRoleAsync(myuser, "User");
-                    if (check.Succeeded)
-                    {
                         return RedirectToAction("Login");
-                    }
+                    
                 }
                 foreach (var item in result.Errors)
                 {
@@ -93,23 +94,28 @@ namespace Product_Catalog_Web_Application.Controllers
                 if (myUser != null)
                 {
                     bool check = await _userManager.CheckPasswordAsync(myUser, user.Password);
+                    var role = await _userManager.GetRolesAsync(myUser);
                     if (check)
                     {
-                        JwtToken NewToken = new JwtToken(_userManager,_config);
-                        MyToken Token =await NewToken.GenerateToken(myUser);
-                        var cookieOptions = new CookieOptions
+                        if (role.Contains("Admin"))
                         {
-                            HttpOnly = true, 
-                            Secure = true, 
-                            Expires = DateTime.UtcNow.AddHours(1),
-                            SameSite = SameSiteMode.Strict 
-                        };
+                            await signInManager.SignInAsync(myUser,true);
+                            return RedirectToAction("Show", "Admin");
+                        }
+                        // Sign in with User
+                        else
+                        {
+                            if (role.Contains("User"))
+                            {
+                                List<Claim> claims = new List<Claim>();
+                                claims.Add(new Claim(ClaimTypes.NameIdentifier, myUser.Id));
+                                claims.Add(new Claim(ClaimTypes.Name, myUser.UserName));
 
-                        // Set the JWT token in the cookies
-                         Response.Cookies.Append("jwt_token", Token.Token, cookieOptions);
-                        _logger.LogDebug("GeneratedToken",Token.ToString());
+                                await signInManager.SignInWithClaimsAsync(myUser, true, claims);
+                                return RedirectToAction("Show", "Account");
+                            }
 
-                        return RedirectToAction("Show","Account");
+                        }
                     }
                 }
                 ModelState.AddModelError("LoginError", "Invalid UserName or Password");
@@ -124,12 +130,10 @@ namespace Product_Catalog_Web_Application.Controllers
             ViewBag.Category = Category.Name;
             return View(ProductFromDb);
         }
-        public async Task<IActionResult> Logout(string Id)
+        public async Task<IActionResult> Logout()
         {
-            Response.Cookies.Delete("jwt_token");
-
-            // Optionally, redirect to login page or home page
-            return RedirectToAction("Login", "Account");
+            await signInManager.SignOutAsync();
+            return RedirectToAction("LoginPage");
         }
     }
 }

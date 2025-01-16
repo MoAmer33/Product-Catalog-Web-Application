@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Common;
 using NuGet.Protocol;
@@ -12,7 +13,7 @@ using System.Security.Claims;
 
 namespace Product_Catalog_Web_Application.Controllers
 {
-       
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -52,12 +53,12 @@ namespace Product_Catalog_Web_Application.Controllers
 
             return View(products);
         }
+        [AllowAnonymous]
         public async Task<IActionResult> Register()
         {
             return View();
         }
         [HttpPost]
-        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> SaveRegister(UserRegisterViewModel user)
         {
             if (ModelState.IsValid)
@@ -78,7 +79,7 @@ namespace Product_Catalog_Web_Application.Controllers
             }
             return View("Register", user);
         }
-
+        [AllowAnonymous]
         public async Task<IActionResult> LoginPage()
         {
             return View();
@@ -86,6 +87,8 @@ namespace Product_Catalog_Web_Application.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [AllowAnonymous]
+
         public async Task<IActionResult> Login(UserLoginViewModel user)
         {
             if (ModelState.IsValid)

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NuGet.Common;
-using NuGet.Protocol;
 using Product_Catalog_Web_Application.DataLayer;
 using Product_Catalog_Web_Application.Helper;
 using Product_Catalog_Web_Application.Models;

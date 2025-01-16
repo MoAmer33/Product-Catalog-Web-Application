@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Product_Catalog_Web_Application.DbContext;
+﻿using Product_Catalog_Web_Application.DbContext;
 using Product_Catalog_Web_Application.Models;
 
 namespace Product_Catalog_Web_Application.DataLayer

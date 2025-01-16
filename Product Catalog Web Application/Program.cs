@@ -4,10 +4,6 @@ using Product_Catalog_Web_Application.Data;
 using Product_Catalog_Web_Application.DataLayer;
 using Product_Catalog_Web_Application.DbContext;
 using Product_Catalog_Web_Application.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 
@@ -47,7 +43,7 @@ var app = builder.Build();
         }
 
         //Seed Data
-        //Using scope to Inject servicesUserManager<ApplicationUser> and RoleManager<IdentityRole>  and Dbcontext crorrectly
+        //Using scope to Inject servicesUserManager<ApplicationUser> and RoleManager<IdentityRole>  and Dbcontext correctly
         using (var scope = app.Services.CreateScope())
         {
             var dataInitialization = scope.ServiceProvider.GetRequiredService<Data_initialization>();

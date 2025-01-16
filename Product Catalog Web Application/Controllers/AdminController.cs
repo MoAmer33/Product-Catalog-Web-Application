@@ -5,9 +5,7 @@ using Product_Catalog_Web_Application.ViewModel;
 using Microsoft.AspNetCore.Hosting;
 using Product_Catalog_Web_Application.Helper;
 using Microsoft.AspNetCore.Authorization;
-using Newtonsoft.Json.Linq;
-using NuGet.Common;
-using System.IdentityModel.Tokens.Jwt;
+
 using System.Security.Claims;
 
 namespace Product_Catalog_Web_Application.Controllers
@@ -163,6 +161,8 @@ namespace Product_Catalog_Web_Application.Controllers
                         ModelState.AddModelError("", Upload);
                         return View("Edit", myProduct);
                     }
+                    //Log Information
+                    logger.LogInformation($"StartData {ProductDB.StartDate}  EndDate {ProductDB.EndDate} UserId {ProductDB.UserId}");
                     product.Update(ProductDB);
                     product.Sava();
                     return RedirectToAction("Show");

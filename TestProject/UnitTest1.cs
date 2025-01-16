@@ -25,7 +25,6 @@ namespace TestProject
             Assert.Equal(200, status);
         }
         [Fact]
-        
         public async Task TestAuthrization()
         {
             var client = _factory.CreateClient();

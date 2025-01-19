@@ -69,3 +69,7 @@ app.UseHttpsRedirection();
         app.Run();
     
 
+public partial class Programm()
+{
+
+}

@@ -55,7 +55,7 @@ namespace Product_Catalog_Web_Application.DataLayer
             context.SaveChanges();
         }
 
-        public async Task<int> TotalItemCountAsync(Func<Product, bool> func)
+        public async Task<int> ItemsCountAsync(Func<Product, bool> func)
         {
             if (func == null)
             {

@@ -56,7 +56,7 @@ namespace Product_Catalog_Web_Application.Controllers
                 Data = products.ToList(),
                 PageNumber = PageNumber,
                 PageSize = PageSize,
-                TotalItems =await product.TotalItemCountAsync(Filter)
+                TotalItems =await product.ItemsCountAsync(Filter)
             };
             return View(result);
         }
@@ -66,6 +66,8 @@ namespace Product_Catalog_Web_Application.Controllers
             return View();
         }
         [HttpPost]
+        [AllowAnonymous]
+
         public async Task<IActionResult> SaveRegister(UserRegisterViewModel user)
         {
             if (ModelState.IsValid)
@@ -76,7 +78,7 @@ namespace Product_Catalog_Web_Application.Controllers
                 IdentityResult result = await _userManager.CreateAsync(myuser, user.Password);
                 if (result.Succeeded)
                 {
-                        return RedirectToAction("Login");
+                        return RedirectToAction("LoginPage");
                     
                 }
                 foreach (var item in result.Errors)
@@ -116,15 +118,11 @@ namespace Product_Catalog_Web_Application.Controllers
                             return RedirectToAction("Show", "Admin");
                         }
                         // Sign in with User
-                        else
-                        {
-                            if (role.Contains("User"))
-                            {
-                                
+                        else 
+                        {       
 
                                 await signInManager.SignInWithClaimsAsync(myUser, true, claims);
                                 return RedirectToAction("Show", "Account");
-                            }
 
                         }
                     }

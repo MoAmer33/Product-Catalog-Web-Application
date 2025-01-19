@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.VisualBasic.FileIO;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Newtonsoft.Json;
+using Product_Catalog_Web_Application.ViewModel;
 using System.Net;
 using System.Text;
 
@@ -39,29 +41,26 @@ namespace TestProject
         {
             var client = _factory.CreateClient();
 
-            var loginData = new
-            {
-                Username = "Admin", 
-                Password = "12345" 
-            };
-
+            var loginData = new UserLoginViewModel();
+            loginData.Name = "Admin";
+            loginData.Password = "12345";
+          
             // Serialize the login data to JSON
             var jsonData = JsonConvert.SerializeObject(loginData);
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync("/Account/Login", content);
 
-            Assert.Equal(200, (int)response.StatusCode); 
+            response.EnsureSuccessStatusCode();
         }
         [Fact]
         public async Task TestAuthorizationOfAdminRole()
         {
             var client = _factory.CreateClient();
-            var loginData = new
-            {
-                Username = "mohamed", 
-                Password = "123"
-            };
+            var loginData = new UserLoginViewModel();
+            loginData.Name = "mohamed";
+            loginData.Password = "123";
+            
             var jsonData = JsonConvert.SerializeObject(loginData);
             var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
 

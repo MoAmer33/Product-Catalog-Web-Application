@@ -41,26 +41,19 @@ namespace Product_Catalog_Web_Application.Controllers
         }
 
         //Ajax Call Check the Product Name is Unique 
-        public async Task<IActionResult> CheckIdentityProduct(string Name)
+        public async Task<bool> CheckIdentityProduct(string Name, ProductViewModel newProduct)
         {
-            var myProduct = await product.GetSpecificAsync(p => p.Name == Name);
-
-            if (myProduct == null)
-            {
-                // IN Case the Product is the FirstTime
-                return Json(true);
-            }
-            return Json(true);
-
-            /*else
-            {
-            //check when make Edit the Name of Product Exist For that made this condition to check this case
-            var query = HttpContext.Request.Query["Id"];
-            if (myProduct.Id == query)
-                return Json(true);
-            }
-
-        return Json(false);*/
+            //Check Product Identity
+               var my_product=await product.GetSpecificAsync(p=>p.Name.Trim() == newProduct.Name.Trim());
+               if (my_product != null)
+               {    
+                   if (my_product.Id == newProduct.Id)
+                   {
+                    return true;
+                   }
+                   return false;
+               }         
+                return true;  
         }
         [HttpGet]
         public async Task<IActionResult> Show(string CategoryId,int PageNumber=1,int PageSize=3)
@@ -84,7 +77,7 @@ namespace Product_Catalog_Web_Application.Controllers
                 Data = products,
                 PageNumber = PageNumber,
                 PageSize = PageSize,
-                TotalItems =await product.TotalItemCountAsync(func)
+                TotalItems =await product.ItemsCountAsync(func)
             };
             return View(result);
         }
@@ -97,9 +90,9 @@ namespace Product_Catalog_Web_Application.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveNewProduct(ProductViewModel newProduct)
         {
+            ViewBag.Categories = await category.GetAllAsync();
             if (ModelState.IsValid)
             {
-
                 var NewobjProduct = new Product();
                 NewobjProduct.StartDate = newProduct.StartDate;
                 NewobjProduct.EndDate = newProduct.EndDate;
@@ -112,6 +105,13 @@ namespace Product_Catalog_Web_Application.Controllers
                 
                 NewobjProduct.UserId =User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+                //Check Identity Of Product Name
+                bool check=await CheckIdentityProduct(newProduct.Name, newProduct);
+                if (!check)
+                {
+                    ModelState.AddModelError("", "Product Name Already Exist");
+                    return View("CreateProduct", newProduct);
+                }
                 //save Image
                 var upload_image = new UploadImage(hosting);
                 var Upload = await upload_image.Upload(newProduct);
@@ -122,14 +122,13 @@ namespace Product_Catalog_Web_Application.Controllers
                 else
                 {
                     ModelState.AddModelError("", Upload.ErrorMessage);
-                    return View(newProduct);
+                    return View("CreateProduct", newProduct);
                 }
                 await product.CreateAsync(NewobjProduct);
                 await product.SavaAsync();
                 logger.LogDebug($"User Id {NewobjProduct.UserId}  DateTime {DateTime.Now}");
                 return RedirectToAction("Show");
             }
-            ViewBag.Categories = await category.GetAllAsync();
             return View("CreateProduct", newProduct);
         }
 
@@ -161,8 +160,16 @@ namespace Product_Catalog_Web_Application.Controllers
                 ProductDB.CategoryId = myProduct.CategoryId;
                 ProductDB.duration = (myProduct.EndDate - myProduct.StartDate).ToString();
                 ProductDB.UserId =User.FindFirstValue(ClaimTypes.NameIdentifier);
-                
-                    var upload_image = new UploadImage(hosting);
+
+                //check identity
+                bool check = await CheckIdentityProduct(myProduct.Name, myProduct);
+                if (!check)
+                {
+                    ModelState.AddModelError("", "Product Name Already Exist");
+                    return View("CreateProduct", myProduct);
+                }
+
+                var upload_image = new UploadImage(hosting);
                     var Upload = await upload_image.Upload(myProduct);
                     if (Upload.Check == "true")
                     {

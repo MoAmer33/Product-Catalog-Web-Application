@@ -18,7 +18,7 @@ namespace Product_Catalog_Web_Application.Data
         public Data_initialization(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
             IServiceScopeFactory scopeFactory, ILogger<Data_initialization> Logger)
         {
-           this.userManager = userManager;
+            this.userManager = userManager;
             this.roleManager = roleManager;
             this.scopeFactory = scopeFactory;
             logger = Logger;

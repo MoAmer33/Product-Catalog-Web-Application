@@ -13,7 +13,7 @@ namespace Product_Catalog_Web_Application.DataLayer
         public Task CreateAsync(T entity);
         public Task UpdateAsync(T entity);
         public Task DeleteAsync(string id);
-        public Task<int> TotalItemCountAsync(Func<T, bool> func);
+        public Task<int> ItemsCountAsync(Func<T, bool> func);
         public Task SavaAsync();
         
     }

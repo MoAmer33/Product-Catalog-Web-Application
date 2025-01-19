@@ -1,4 +1,5 @@
-﻿using Product_Catalog_Web_Application.DbContext;
+﻿using Microsoft.EntityFrameworkCore;
+using Product_Catalog_Web_Application.DbContext;
 using Product_Catalog_Web_Application.Models;
 
 namespace Product_Catalog_Web_Application.DataLayer
@@ -12,41 +13,58 @@ namespace Product_Catalog_Web_Application.DataLayer
         {
             this.context=_context;
         }
-        public  void Create(Product entity)
+        public async Task CreateAsync(Product entity)
         {
              context.Products.Add(entity);
         }
 
-        public async void Delete(string id)
+        public async Task DeleteAsync(string id)
         {
             var product=await GetByIdAsync(id);
             context.Remove(product);
         }
-        //I Can pass Condition in Where Dynamic By Using Delegate
-        public async Task<List<Product>> GetAllAsync(Func<Product,bool>? func=null)
+
+        public async Task<IQueryable<Product>> GetAllAsync()
+        {
+            return context.Products.AsNoTracking();
+        }
+
+        public async Task<List<Product>> GetAllWithQueryAsync(Func<Product, bool> func, int PageNumber, int PageSize)
         {
             if (func == null)
             {
-                return context.Products.ToList();
+                return context.Products.AsNoTracking().Skip((PageNumber-1)*PageSize).Take(PageSize).ToList();
             }
-            return context.Products.Where(func).ToList(); 
+            return context.Products.AsNoTracking().Where(func).Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
         }
+
+        //I Can pass Condition in Where Dynamic By Using Delegate
+
 
         public async Task<Product> GetByIdAsync(string id)
         {
-            return context.Products.FirstOrDefault(p => p.Id == id);
+            return context.Products.AsNoTracking().FirstOrDefault(p => p.Id == id);
         }
         public async Task<Product> GetSpecificAsync(Func<Product, bool> func)
         {
-            return context.Products.FirstOrDefault(func);
+            return context.Products.AsNoTracking().FirstOrDefault(func);
         }
 
-        public void Sava()
+        public async Task SavaAsync()
         {
             context.SaveChanges();
         }
 
-        public async void Update(Product product)
+        public async Task<int> TotalItemCountAsync(Func<Product, bool> func)
+        {
+            if (func == null)
+            {
+                return context.Products.AsNoTracking().Count();
+            }
+            return context.Products.AsNoTracking().Where(func).Count();
+        }
+
+        public async Task UpdateAsync(Product product)
         {
            
             context.Products.Update(product);

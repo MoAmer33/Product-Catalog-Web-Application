@@ -12,7 +12,7 @@ namespace Product_Catalog_Web_Application.Helper
         this.hosting = _hosting;
         }
 
-        public async Task<string> Upload(ProductViewModel newProduct)
+        public async Task<dynamic> Upload(ProductViewModel newProduct)
         {
             //ignore case-insensitive
             //And Accept .jpg, .jpeg, .png, .JPG, .JPEG, .PNG" in Html input
@@ -26,15 +26,18 @@ namespace Product_Catalog_Web_Application.Helper
                 {
                 
                     string ImagesFilePath = Path.Combine(hosting.WebRootPath, "Images");
-                    image_file = newProduct.Image.FileName;
+                    image_file = Guid.NewGuid().ToString()+newProduct.Image.FileName;
                     string FullPath = Path.Combine(ImagesFilePath, image_file);
-                    if (!System.IO.File.Exists(FullPath))
-                    newProduct.Image.CopyTo(new FileStream(FullPath, FileMode.Create));
-                    return "true";
+                    using (FileStream fs = new FileStream(FullPath, FileMode.Create))
+                    {
+                        newProduct.Image.CopyTo(fs);  
+                    }
+                    return new { Check = "true", UniqueImageName = image_file };
                 }
 
             }
-            return ErrorMessage;
+            return new { Check = "false", ErrorMessage = ErrorMessage };
+
         }
     }
 }

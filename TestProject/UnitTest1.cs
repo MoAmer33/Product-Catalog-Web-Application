@@ -100,5 +100,30 @@ namespace TestProject
 
             Assert.Equal(200, status);
         }
+        [Fact]
+        public async Task CheckContentReturned()
+        {
+            var client = _factory.CreateClient();
+
+            var loginData = new
+            {
+                Username = "Admin",
+                Password = "12345"
+            };
+
+            var jsonData = JsonConvert.SerializeObject(loginData);
+            var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+            var loginResponse = await client.PostAsync("/Account/Login", content);
+            loginResponse.EnsureSuccessStatusCode();
+
+            var response = await client.GetAsync("/Admin/Show");
+
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            Assert.False(string.IsNullOrEmpty(responseContent));
+        }
     }
 }

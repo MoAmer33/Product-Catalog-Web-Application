@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using cloudscribe.Pagination.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Product_Catalog_Web_Application.DataLayer;
 using Product_Catalog_Web_Application.Helper;
 using Product_Catalog_Web_Application.Models;
@@ -31,25 +33,32 @@ namespace Product_Catalog_Web_Application.Controllers
             this.signInManager = signInManager;
         }
 
-        public async Task<IActionResult> Show(string CategoryId)
+        public async Task<IActionResult> Show(string CategoryId,int PageNumber=1,int PageSize=3)
         {
-            ViewBag.Categories = await category.GetAllAsync(null);
+            ViewBag.Categories = await category.GetAllWithQueryAsync(null,0,0);
 
-            List<Product> products = null;
+            IEnumerable<Product> products = null;
 
             //Filter By Category
             //Get Product in specific Time For Users Not Admin
+            Func<Product, bool> Filter = null;
             if (CategoryId != null && CategoryId != "ShowAll")
             {
-                Func<Product, bool> Filter2 = p => DateTime.Now >= p.StartDate && DateTime.Now <= p.EndDate && p.CategoryId == CategoryId;
-                products = await product.GetAllAsync(Filter2);
+                Filter= p => DateTime.Now >= p.StartDate && DateTime.Now <= p.EndDate && p.CategoryId == CategoryId; 
+                products = await product.GetAllWithQueryAsync(Filter, PageNumber,PageSize);
             }else
             {
-                Func<Product, bool> Filter = p => DateTime.Now >= p.StartDate && DateTime.Now <= p.EndDate;
-                products = await product.GetAllAsync(Filter);
+                Filter = p => DateTime.Now >= p.StartDate && DateTime.Now <= p.EndDate;
+                products = await product.GetAllWithQueryAsync(Filter, PageNumber, PageSize);
             }
-
-            return View(products);
+            var result = new PagedResult<Product>()
+            {
+                Data = products.ToList(),
+                PageNumber = PageNumber,
+                PageSize = PageSize,
+                TotalItems =await product.TotalItemCountAsync(Filter)
+            };
+            return View(result);
         }
         [AllowAnonymous]
         public async Task<IActionResult> Register()
@@ -98,9 +107,12 @@ namespace Product_Catalog_Web_Application.Controllers
                     var role = await _userManager.GetRolesAsync(myUser);
                     if (check)
                     {
+                        List<Claim> claims = new List<Claim>();
+                        claims.Add(new Claim(ClaimTypes.NameIdentifier, myUser.Id));
+                        claims.Add(new Claim(ClaimTypes.Name, myUser.UserName));
                         if (role.Contains("Admin"))
                         {
-                            await signInManager.SignInAsync(myUser,true);
+                            await signInManager.SignInWithClaimsAsync(myUser,true,claims);
                             return RedirectToAction("Show", "Admin");
                         }
                         // Sign in with User
@@ -108,9 +120,7 @@ namespace Product_Catalog_Web_Application.Controllers
                         {
                             if (role.Contains("User"))
                             {
-                                List<Claim> claims = new List<Claim>();
-                                claims.Add(new Claim(ClaimTypes.NameIdentifier, myUser.Id));
-                                claims.Add(new Claim(ClaimTypes.Name, myUser.UserName));
+                                
 
                                 await signInManager.SignInWithClaimsAsync(myUser, true, claims);
                                 return RedirectToAction("Show", "Account");

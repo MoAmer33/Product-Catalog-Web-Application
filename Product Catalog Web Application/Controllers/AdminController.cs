@@ -7,6 +7,8 @@ using Product_Catalog_Web_Application.Helper;
 using Microsoft.AspNetCore.Authorization;
 
 using System.Security.Claims;
+using cloudscribe.Pagination.Models;
+using System.Linq;
 
 namespace Product_Catalog_Web_Application.Controllers
 {
@@ -61,22 +63,35 @@ namespace Product_Catalog_Web_Application.Controllers
         return Json(false);*/
         }
         [HttpGet]
-        public async Task<IActionResult> Show(string CategoryId)
+        public async Task<IActionResult> Show(string CategoryId,int PageNumber=1,int PageSize=3)
         {
-            ViewBag.Categories = await category.GetAllAsync(null);
+            ViewBag.Categories = await category.GetAllAsync();
+            Func<Product, bool> func = null;
             List<Product> products = null;
             //Filter By Category
             if (CategoryId != null && CategoryId != "ShowAll")
-                products = await product.GetAllAsync(p => p.CategoryId == CategoryId);
+            {
+                func = p => p.CategoryId == CategoryId;
+                products = await product.GetAllWithQueryAsync(func,PageNumber,PageSize);
+            }
             else
-                products = await product.GetAllAsync(null);
+            {
+                products = await product.GetAllWithQueryAsync(func, PageNumber, PageSize);
+            }
 
-            return View(products);
+            var result = new PagedResult<Product>()
+            {
+                Data = products,
+                PageNumber = PageNumber,
+                PageSize = PageSize,
+                TotalItems =await product.TotalItemCountAsync(func)
+            };
+            return View(result);
         }
         public async Task<IActionResult> CreateProduct()
         {
             //pass null beacuse i use delegate and here i need all Category For that i do not pass condition
-            ViewBag.Categories = await category.GetAllAsync(null);
+            ViewBag.Categories = await category.GetAllAsync();
             return View();
         }
         [HttpPost]
@@ -99,28 +114,28 @@ namespace Product_Catalog_Web_Application.Controllers
 
                 //save Image
                 var upload_image = new UploadImage(hosting);
-                string Upload = await upload_image.Upload(newProduct);
-                if (Upload == "true")
+                var Upload = await upload_image.Upload(newProduct);
+                if (Upload.Check=="true")
                 {
-                    NewobjProduct.Image = newProduct.Image.FileName;
+                    NewobjProduct.Image =Upload.UniqueImageName;
                 }
                 else
                 {
-                    ModelState.AddModelError("", Upload);
+                    ModelState.AddModelError("", Upload.ErrorMessage);
                     return View(newProduct);
                 }
-                product.Create(NewobjProduct);
-                product.Sava();
+                await product.CreateAsync(NewobjProduct);
+                await product.SavaAsync();
                 logger.LogDebug($"User Id {NewobjProduct.UserId}  DateTime {DateTime.Now}");
                 return RedirectToAction("Show");
             }
-            ViewBag.Categories = await category.GetAllAsync(null);
+            ViewBag.Categories = await category.GetAllAsync();
             return View("CreateProduct", newProduct);
         }
 
         public async Task<IActionResult> Edit(string Id)
         {
-            ViewBag.Categories = await category.GetAllAsync(null);
+            ViewBag.Categories = await category.GetAllAsync();
             Product EditProduct = await product.GetByIdAsync(Id);
             var ViewModel = new ProductViewModel();
             ViewModel.StartDate = EditProduct.StartDate;
@@ -135,7 +150,7 @@ namespace Product_Catalog_Web_Application.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveEdit(ProductViewModel myProduct)
         {
-            ViewBag.Categories = await category.GetAllAsync(null);
+            ViewBag.Categories = await category.GetAllAsync();
             if (ModelState.IsValid)
             {
                 var ProductDB = await product.GetByIdAsync(myProduct.Id);
@@ -146,27 +161,28 @@ namespace Product_Catalog_Web_Application.Controllers
                 ProductDB.CategoryId = myProduct.CategoryId;
                 ProductDB.duration = (myProduct.EndDate - myProduct.StartDate).ToString();
                 ProductDB.UserId =User.FindFirstValue(ClaimTypes.NameIdentifier);
-                string CheckImage = myProduct.Image.FileName;
-                if (ProductDB.Image != CheckImage)
-                {
+                
                     var upload_image = new UploadImage(hosting);
-                    string Upload = await upload_image.Upload(myProduct);
-                    if (Upload == "true")
+                    var Upload = await upload_image.Upload(myProduct);
+                    if (Upload.Check == "true")
                     {
-                        ProductDB.Image = myProduct.Image.FileName;
+                        string Root = Path.Combine(hosting.WebRootPath, "Images");
+                        string FullPath = Path.Combine(Root, ProductDB.Image);
+                        System.IO.File.Delete(FullPath);
+                        ProductDB.Image = Upload.UniqueImageName;
                     }
                     else
                     {
-                        ModelState.AddModelError("", Upload);
+                        ModelState.AddModelError("", Upload.ErrorMessage);
                         return View("Edit", myProduct);
                     }
                     //Log Information
                     logger.LogInformation($"StartData {ProductDB.StartDate}  EndDate {ProductDB.EndDate} UserId {ProductDB.UserId}");
-                    product.Update(ProductDB);
-                    product.Sava();
+                   await product.UpdateAsync(ProductDB);
+                   await product.SavaAsync();
                     return RedirectToAction("Show");
 
-                }
+                
             }
             return View("Edit", myProduct);
         }
@@ -194,9 +210,9 @@ namespace Product_Catalog_Web_Application.Controllers
                     ModelState.AddModelError("", ex.Message);
                 }
 
-
-            product.Delete(Id);
-            product.Sava();
+                  await product.DeleteAsync(Id);
+                  await product.SavaAsync();
+            
 
             return RedirectToAction("Show");
         }

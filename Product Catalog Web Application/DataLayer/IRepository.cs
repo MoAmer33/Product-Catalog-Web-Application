@@ -5,13 +5,16 @@ namespace Product_Catalog_Web_Application.DataLayer
 {
     public interface IRepository<T>
     {
-        public  Task<List<T>> GetAllAsync(Func<T, bool> func);
+        public  Task<IQueryable<T>> GetAllAsync();
+        public Task<List<T>> GetAllWithQueryAsync(Func<T, bool> func, int PageNumber, int PageSize);
+
         public Task<T> GetByIdAsync(string id);
         public Task<T> GetSpecificAsync(Func<T, bool> func);
-        public void Create(T entity);
-        public void Update(T entity);
-        public void Delete(string id);
-        public void Sava();
+        public Task CreateAsync(T entity);
+        public Task UpdateAsync(T entity);
+        public Task DeleteAsync(string id);
+        public Task<int> TotalItemCountAsync(Func<T, bool> func);
+        public Task SavaAsync();
         
     }
 }

@@ -22,6 +22,8 @@
 
  
   <ItemGroup>
+    <PackageReference Include="cloudscribe.Pagination.Models" Version="8.0.0" />
+    <PackageReference Include="cloudscribe.Web.Pagination" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
@@ -31,7 +33,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="TestProject"/>
+    <InternalsVisibleTo Include="TestProject" />
   </ItemGroup>
 
 </Project>

@@ -16,6 +16,7 @@ builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("cs"));
 });
 
+builder.Services.AddCloudscribePagination();
 // Make Register For Identity
 builder.Services.AddScoped<IProduct,ProductsRepo>();
 builder.Services.AddScoped<ICategory, CategoryRepo>();

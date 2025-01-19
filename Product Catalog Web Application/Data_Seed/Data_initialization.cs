@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Product_Catalog_Web_Application.DbContext;
 using Product_Catalog_Web_Application.Models;
+using System.Drawing;
 
 namespace Product_Catalog_Web_Application.Data
 {
@@ -10,14 +12,16 @@ namespace Product_Catalog_Web_Application.Data
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IServiceScopeFactory scopeFactory;
+        private readonly ILogger<Data_initialization> logger;
 
         // Constructor injection of UserManager, RoleManager, and IServiceScopeFactory
-        public Data_initialization(UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager,
-            IServiceScopeFactory scopeFactory)
+        public Data_initialization(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
+            IServiceScopeFactory scopeFactory, ILogger<Data_initialization> Logger)
         {
            this.userManager = userManager;
             this.roleManager = roleManager;
             this.scopeFactory = scopeFactory;
+            logger = Logger;
         }
 
         public async Task<string> Seed()
@@ -63,18 +67,25 @@ namespace Product_Catalog_Web_Application.Data
                
                 //Create Seed Values for UsersAdmin
                 string UserCreated=string.Empty;
-                var AdminsEmails = new[] { "Mohamed@admin.com", "Ahmed@admin.com" };
+                var AdminsEmails = new[] { "Mohamed@admin.com", "Ahmed@admin.com", "Admin@admin.com" };
                 foreach (var Admin in AdminsEmails)
                 {
                     var user = await userManager.FindByEmailAsync(Admin);
                     if (user == null)
                     {
-                        var UserObject = new ApplicationUser() { UserName = "AhmedAdmin", Email = Admin,PasswordHash="123" };
+                        var UserObject = new ApplicationUser() { UserName = "NewAdmin", Email = Admin,PasswordHash="123" };
                         IdentityResult result = await userManager.CreateAsync(UserObject,UserObject.PasswordHash);
                         if (result.Succeeded)
                         {
                             await userManager.AddToRoleAsync(UserObject, "Admin");
                             UserCreated = "New Admins Created";
+                        }
+                        else
+                        {
+                            foreach(var error in result.Errors)
+                            {
+                                logger.LogInformation(error.Description);
+                            }
                         }
                     }
 

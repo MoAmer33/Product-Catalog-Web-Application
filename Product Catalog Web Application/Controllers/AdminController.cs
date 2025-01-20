@@ -39,6 +39,14 @@ namespace Product_Catalog_Web_Application.Controllers
             }
             return Json(false);
         }
+        public async Task<IActionResult> CheckPriceIsPositve(decimal Price)
+        {
+            if (Price >= 0)
+                return Json(true);
+
+            return Json(false);
+            
+        }
 
         //Ajax Call Check the Product Name is Unique 
         public async Task<bool> CheckIdentityProduct(string Name, ProductViewModel newProduct)
@@ -143,6 +151,7 @@ namespace Product_Catalog_Web_Application.Controllers
             ViewModel.CategoryId = EditProduct.CategoryId;
             ViewModel.Price = EditProduct.Price;
             ViewModel.Id = EditProduct.Id;
+            ViewModel.ImageName=EditProduct.Image;
             return View(ViewModel);
         }
 

@@ -14,17 +14,15 @@ namespace Product_Catalog_Web_Application.ViewModel
         [MaxLength(20)]
         public string Name { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy hh:mm tt}", ApplyFormatInEditMode = true)]
         [Remote(action: "CheckDate", controller:"Admin",AdditionalFields = "EndDate", ErrorMessage ="Check StartDate is greater than Time now OR Check the EndDate is Greater than StartDate")]
         public DateTime StartDate { get; set; }
-
-        
-        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy hh:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime EndDate{ get; set; }
 
         public IFormFile Image { get; set; }
- 
+        public string ImageName { get; set; }
+
         [Required]
+        [Remote(action: "CheckPriceIsPositve",controller:"Admin",ErrorMessage ="Price Should be Positive")]
         public decimal Price { get; set; }
 
         public string CategoryId { get; set; }// To get Category Id that is slected by user

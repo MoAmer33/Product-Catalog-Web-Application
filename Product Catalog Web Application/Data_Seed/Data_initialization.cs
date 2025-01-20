@@ -13,7 +13,7 @@ namespace Product_Catalog_Web_Application.Data
         public Data_initialization(IServiceScopeFactory scopeFactory)
         {
             this.scopeFactory = scopeFactory;
-            
+
         }
 
         public async Task Seed()

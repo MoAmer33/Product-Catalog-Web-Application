@@ -19,7 +19,6 @@ namespace Product_Catalog_Web_Application.ViewModel
         public DateTime EndDate{ get; set; }
 
         public IFormFile Image { get; set; }
-        public string ImageName { get; set; }
 
         [Required]
         [Remote(action: "CheckPriceIsPositve",controller:"Admin",ErrorMessage ="Price Should be Positive")]

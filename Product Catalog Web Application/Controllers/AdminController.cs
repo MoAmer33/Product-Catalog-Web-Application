@@ -151,7 +151,6 @@ namespace Product_Catalog_Web_Application.Controllers
             ViewModel.CategoryId = EditProduct.CategoryId;
             ViewModel.Price = EditProduct.Price;
             ViewModel.Id = EditProduct.Id;
-            ViewModel.ImageName=EditProduct.Image;
             return View(ViewModel);
         }
 

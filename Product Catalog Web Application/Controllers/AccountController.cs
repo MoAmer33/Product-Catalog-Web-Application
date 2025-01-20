@@ -19,14 +19,12 @@ namespace Product_Catalog_Web_Application.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICategory category;
         private readonly IProduct product;
-        private readonly IConfiguration _config;
         private readonly ILogger<AccountController> _logger;
         private readonly SignInManager<ApplicationUser> signInManager;
-        public AccountController(UserManager<ApplicationUser> userManager,IConfiguration configuration,
-            ICategory category, IProduct product, ILogger<AccountController> logger, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager,ICategory category,
+            IProduct product, ILogger<AccountController> logger, SignInManager<ApplicationUser> signInManager)
         {
             this._userManager = userManager;
-            this._config = configuration;
             this.category = category;
             this.product = product;
             this._logger = logger;
@@ -35,7 +33,7 @@ namespace Product_Catalog_Web_Application.Controllers
 
         public async Task<IActionResult> Show(string CategoryId,int PageNumber=1,int PageSize=3)
         {
-            ViewBag.Categories = await category.GetAllWithQueryAsync(null,0,0);
+            ViewBag.Categories = await category.GetAllAsync();
 
             IEnumerable<Product> products = null;
 
@@ -120,10 +118,8 @@ namespace Product_Catalog_Web_Application.Controllers
                         // Sign in with User
                         else 
                         {       
-
-                                await signInManager.SignInWithClaimsAsync(myUser, true, claims);
-                                return RedirectToAction("Show", "Account");
-
+                           await signInManager.SignInWithClaimsAsync(myUser, true, claims);
+                           return RedirectToAction("Show", "Account");
                         }
                     }
                 }

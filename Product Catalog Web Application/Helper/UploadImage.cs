@@ -21,7 +21,7 @@ namespace Product_Catalog_Web_Application.Helper
             string ErrorMessage = "Length Of File Should Be less or Equal than 1MB And jpg, jpeg, png Extension Or Name Of Image Exist Already";
             if (newProduct.Image != null)
             {
-                    var split = newProduct.Image.FileName.Split('.')[1];
+                   var split = newProduct.Image.FileName.Split('.')[1];
                 if (newProduct.Image.Length <= 1 * 1024 * 1024 && Extensions.Contains(split))
                 {
                 

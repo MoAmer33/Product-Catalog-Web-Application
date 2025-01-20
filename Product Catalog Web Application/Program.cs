@@ -48,14 +48,12 @@ var app = builder.Build();
         using (var scope = app.Services.CreateScope())
         {
             var dataInitialization = scope.ServiceProvider.GetRequiredService<Data_initialization>();
-            string consoleMessage = await dataInitialization.Seed(); 
-            Console.WriteLine(consoleMessage); 
+            await dataInitialization.Seed(); 
         }
 
 
 app.UseHttpsRedirection();
         app.UseStaticFiles();
-       
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
@@ -68,8 +66,3 @@ app.UseHttpsRedirection();
 
         app.Run();
     
-
-public partial class Programm()
-{
-
-}

@@ -7,28 +7,24 @@ using System.Drawing;
 namespace Product_Catalog_Web_Application.Data
 {
     public class Data_initialization
-    {
-        //Injected UserManager and Role
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly RoleManager<IdentityRole> roleManager;
+    {    
         private readonly IServiceScopeFactory scopeFactory;
-        private readonly ILogger<Data_initialization> logger;
 
-        // Constructor injection of UserManager, RoleManager, and IServiceScopeFactory
-        public Data_initialization(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
-            IServiceScopeFactory scopeFactory, ILogger<Data_initialization> Logger)
+        public Data_initialization(IServiceScopeFactory scopeFactory)
         {
-            this.userManager = userManager;
-            this.roleManager = roleManager;
             this.scopeFactory = scopeFactory;
-            logger = Logger;
+            
         }
 
-        public async Task<string> Seed()
+        public async Task Seed()
         {
             using (var Service = scopeFactory.CreateScope())
             {
                 var DB=Service.ServiceProvider.GetRequiredService<Context>();
+                var userManager = Service.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManager = Service.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var logger = Service.ServiceProvider.GetRequiredService<ILogger<Data_initialization>>();
+
                 string CategoryCreated = string.Empty;
                 DB.Database.EnsureCreated();
 
@@ -67,13 +63,13 @@ namespace Product_Catalog_Web_Application.Data
                
                 //Create Seed Values for UsersAdmin
                 string UserCreated=string.Empty;
-                var AdminsEmails = new[] { "Mohamed@admin.com", "Ahmed@admin.com", "Admin@admin.com" };
+                var AdminsEmails = new[] { "Mohamed@admin.com", "Ahmed@admin.com", "Admin@admin.com", "myAdmin@Admin.com" };
                 foreach (var Admin in AdminsEmails)
                 {
                     var user = await userManager.FindByEmailAsync(Admin);
                     if (user == null)
                     {
-                        var UserObject = new ApplicationUser() { UserName = "NewAdmin", Email = Admin,PasswordHash="123" };
+                        var UserObject = new ApplicationUser() { UserName = "MyAdmin", Email = Admin,PasswordHash="123" };
                         IdentityResult result = await userManager.CreateAsync(UserObject,UserObject.PasswordHash);
                         if (result.Succeeded)
                         {
@@ -90,7 +86,7 @@ namespace Product_Catalog_Web_Application.Data
                     }
 
                 }
-                     return $"{UserCreated} ------ {RolesCreated} ------ {CategoryCreated}"; 
+                     logger.LogInformation($"{UserCreated} ------ {RolesCreated} ------ {CategoryCreated}"); 
             }            
         }
     }

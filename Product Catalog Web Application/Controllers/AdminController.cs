@@ -18,7 +18,7 @@ namespace Product_Catalog_Web_Application.Controllers
         private readonly IProduct product;
         private readonly ICategory category;
         private readonly IWebHostEnvironment hosting;
-        ILogger<AdminController> logger;
+        private readonly ILogger<AdminController> logger;
 
 
         public AdminController(IProduct _product, ICategory _category, IWebHostEnvironment _hosting, ILogger<AdminController> logger)
@@ -33,7 +33,7 @@ namespace Product_Catalog_Web_Application.Controllers
         {
             if (StartDate > DateTime.Now)
             {
-                Console.WriteLine(StartDate.ToString());
+                logger.LogInformation(StartDate.ToString());
                 if (EndDate > StartDate)
                     return Json(true);
             }
@@ -185,11 +185,9 @@ namespace Product_Catalog_Web_Application.Controllers
                     }
                     //Log Information
                     logger.LogInformation($"StartData {ProductDB.StartDate}  EndDate {ProductDB.EndDate} UserId {ProductDB.UserId}");
-                   await product.UpdateAsync(ProductDB);
-                   await product.SavaAsync();
-                    return RedirectToAction("Show");
-
-                
+                    await product.UpdateAsync(ProductDB);
+                    await product.SavaAsync();
+                    return RedirectToAction("Show");          
             }
             return View("Edit", myProduct);
         }

@@ -21,10 +21,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.SlidingExpiration = true; // Extend session timeout
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); // Expire session after 30 minutes
-    options.LoginPath = "/Account/Login"; // Redirect to login page
-    options.AccessDeniedPath = "/Account/AccessDenied"; // Redirect for unauthorized access
+    options.SlidingExpiration = true; 
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30); 
+    options.LoginPath = "/Account/Login";
 });
 // Make Register For Identity
 builder.Services.AddScoped<IProduct,ProductsRepo>();

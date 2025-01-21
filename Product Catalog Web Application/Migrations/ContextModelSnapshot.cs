@@ -232,7 +232,7 @@ namespace Product_Catalog_Web_Application.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product", b =>
@@ -279,7 +279,7 @@ namespace Product_Catalog_Web_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

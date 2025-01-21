@@ -18,10 +18,12 @@ namespace Product_Catalog_Web_Application.ViewModel
         public DateTime StartDate { get; set; }
         public DateTime EndDate{ get; set; }
 
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
+        public string? ImageName { get; set; }
+
 
         [Required]
-        [Remote(action: "CheckPriceIsPositve",controller:"Admin",ErrorMessage ="Price Should be Positive")]
+        [Remote(action: "CheckPriceIsPositve",controller:"Admin",ErrorMessage ="Price Should be Positive and Less than or equal 60000 LE")]
         public decimal Price { get; set; }
 
         public string CategoryId { get; set; }// To get Category Id that is slected by user

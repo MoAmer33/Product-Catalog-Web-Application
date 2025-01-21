@@ -41,7 +41,7 @@ namespace Product_Catalog_Web_Application.Controllers
         }
         public async Task<IActionResult> CheckPriceIsPositve(decimal Price)
         {
-            if (Price >= 0)
+            if (Price >= 0&& Price <= 60000)
                 return Json(true);
 
             return Json(false);
@@ -121,8 +121,8 @@ namespace Product_Catalog_Web_Application.Controllers
                     return View("CreateProduct", newProduct);
                 }
                 //save Image
-                var upload_image = new UploadImage(hosting);
-                var Upload = await upload_image.Upload(newProduct);
+                var upload_image = new UploadImage(hosting, newProduct);
+                var Upload = await upload_image.Upload();
                 if (Upload.Check=="true")
                 {
                     NewobjProduct.Image =Upload.UniqueImageName;
@@ -150,6 +150,7 @@ namespace Product_Catalog_Web_Application.Controllers
             ViewModel.Name = EditProduct.Name;
             ViewModel.CategoryId = EditProduct.CategoryId;
             ViewModel.Price = EditProduct.Price;
+            ViewModel.ImageName = EditProduct.Image;
             ViewModel.Id = EditProduct.Id;
             return View(ViewModel);
         }
@@ -168,24 +169,28 @@ namespace Product_Catalog_Web_Application.Controllers
                 ProductDB.CategoryId = myProduct.CategoryId;
                 ProductDB.duration = (myProduct.EndDate - myProduct.StartDate).ToString();
                 ProductDB.UserId =User.FindFirstValue(ClaimTypes.NameIdentifier);
+                myProduct.ImageName = ProductDB.Image;//In Edit Pass the Value of ImageName to viewModel
 
                 //check identity
                 bool check = await CheckIdentityProduct(myProduct.Name, myProduct);
                 if (!check)
                 {
                     ModelState.AddModelError("", "Product Name Already Exist");
-                    return View("CreateProduct", myProduct);
+                    return View("Edit", myProduct);
                 }
-
-                var upload_image = new UploadImage(hosting);
-                    var Upload = await upload_image.Upload(myProduct);
-                    if (Upload.Check == "true")
-                    {
-                        string Root = Path.Combine(hosting.WebRootPath, "Images");
-                        string FullPath = Path.Combine(Root, ProductDB.Image);
-                        System.IO.File.Delete(FullPath);
-                        ProductDB.Image = Upload.UniqueImageName;
-                    }
+                   var upload_image = new UploadImage(hosting, myProduct);
+                   var Upload = await upload_image.Upload();
+                   if (Upload.Check == "true")
+                   {
+                        //Check ImageName that returned is equal to ProductDB
+                        if (Upload.UniqueImageName != ProductDB.Image)
+                        {
+                            string Root = Path.Combine(hosting.WebRootPath, "Images");
+                            string FullPath = Path.Combine(Root,ProductDB.Image);
+                            System.IO.File.Delete(FullPath);
+                            ProductDB.Image = Upload.UniqueImageName;
+                        }
+                   }
                     else
                     {
                         ModelState.AddModelError("", Upload.ErrorMessage);

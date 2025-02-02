@@ -69,7 +69,7 @@ namespace Product_Catalog_Web_Application.Data
                     var user = await userManager.FindByEmailAsync(Admin);
                     if (user == null)
                     {
-                        var UserObject = new ApplicationUser() { UserName = "MyAdmin", Email = Admin,PasswordHash="123" };
+                        var UserObject = new ApplicationUser() { UserName = "Admin", Email = Admin,PasswordHash="123" };
                         IdentityResult result = await userManager.CreateAsync(UserObject,UserObject.PasswordHash);
                         if (result.Succeeded)
                         {

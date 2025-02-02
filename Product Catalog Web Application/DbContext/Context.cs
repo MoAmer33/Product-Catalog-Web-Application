@@ -11,6 +11,12 @@ namespace Product_Catalog_Web_Application.DbContext
         
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<PaymentDetails> PaymentDetails { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Product_Order> Product_Order { get; set; }
+        public DbSet<Products_Cart> Products_Cart { get; set; }
+
 
         public Context(DbContextOptions<Context> options) : base(options)
         {
@@ -31,9 +37,8 @@ namespace Product_Catalog_Web_Application.DbContext
            .HasForeignKey(p => p.UserId);
 
             //Has Max Length
-            builder.Entity<Category>().Property(c => c.Name).HasMaxLength(20);
-            builder.Entity<Product>().Property(p => p.Name).HasMaxLength(20);
-            builder.Entity<ApplicationUser>().Property(p => p.UserName).HasMaxLength(20);
+            builder.Entity<Products_Cart>().HasKey(p => new { p.productId, p.cartId });
+            builder.Entity<Product_Order>().HasKey(p => new { p.productId,p.orderId });
 
             base.OnModelCreating(builder);
         }

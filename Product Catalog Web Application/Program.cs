@@ -60,7 +60,7 @@ var app = builder.Build();
         }
 
 
-app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
         app.UseAuthentication();

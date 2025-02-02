@@ -220,6 +220,22 @@ namespace Product_Catalog_Web_Application.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Cart", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Carts");
+                });
+
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Category", b =>
                 {
                     b.Property<string>("Id")
@@ -227,12 +243,64 @@ namespace Product_Catalog_Web_Application.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Order", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("creationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("totalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("updatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("userId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.PaymentDetails", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("PaymentMehtod")
+                        .HasColumnType("int");
+
+                    b.Property<int>("amount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("creationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("orderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("paymentStatus")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("orderId");
+
+                    b.ToTable("PaymentDetails");
                 });
 
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product", b =>
@@ -256,8 +324,7 @@ namespace Product_Catalog_Web_Application.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -279,7 +346,49 @@ namespace Product_Catalog_Web_Application.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product_Order", b =>
+                {
+                    b.Property<string>("productId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("orderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("productId", "orderId");
+
+                    b.HasIndex("orderId");
+
+                    b.ToTable("Product_Order");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Products_Cart", b =>
+                {
+                    b.Property<string>("productId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("cartId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("productId", "cartId");
+
+                    b.HasIndex("cartId");
+
+                    b.ToTable("Products_Cart");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -333,6 +442,39 @@ namespace Product_Catalog_Web_Application.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Cart", b =>
+                {
+                    b.HasOne("Product_Catalog_Web_Application.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Order", b =>
+                {
+                    b.HasOne("Product_Catalog_Web_Application.Models.ApplicationUser", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.PaymentDetails", b =>
+                {
+                    b.HasOne("Product_Catalog_Web_Application.Models.Order", "order")
+                        .WithMany()
+                        .HasForeignKey("orderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("order");
+                });
+
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product", b =>
                 {
                     b.HasOne("Product_Catalog_Web_Application.Models.Category", "Category")
@@ -352,8 +494,48 @@ namespace Product_Catalog_Web_Application.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product_Order", b =>
+                {
+                    b.HasOne("Product_Catalog_Web_Application.Models.Order", "order")
+                        .WithMany()
+                        .HasForeignKey("orderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Product_Catalog_Web_Application.Models.Product", "Products")
+                        .WithMany()
+                        .HasForeignKey("productId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Products");
+
+                    b.Navigation("order");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Products_Cart", b =>
+                {
+                    b.HasOne("Product_Catalog_Web_Application.Models.Cart", "cart")
+                        .WithMany()
+                        .HasForeignKey("cartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Product_Catalog_Web_Application.Models.Product", "Products")
+                        .WithMany()
+                        .HasForeignKey("productId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Products");
+
+                    b.Navigation("cart");
+                });
+
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("Orders");
+
                     b.Navigation("Products");
                 });
 

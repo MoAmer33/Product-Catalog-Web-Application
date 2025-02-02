@@ -14,7 +14,7 @@ using System.Security.Claims;
 namespace Product_Catalog_Web_Application.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : Controller 
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICategory category;

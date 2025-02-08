@@ -1,0 +1,42 @@
+﻿@model PagedResult<Products_Cart>
+
+@{
+    ViewData["Title"] = "Show";
+}
+<table class="table" class="table-hover" class="table-bordered">
+    <thead>
+        <tr>
+            <th>
+                ProductName
+            </th>
+            <th>
+                Image
+            </th>
+            <th>
+                Price LE
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    @foreach(var item in Model.Data)
+    {
+        <tr>
+            <td>
+                @item.Products.Name
+            </td>
+            <td style="width: 150px; height: 150px;">
+                <img src="~/Images/@item.Products.Image" class="ZoomHover" alt="NotFound" style="width: 80%; height: 110%; object-fit: cover;" />
+            </td>
+            <td>
+                @item.Products.Price
+            </td>
+        </tr>
+    }
+</table>
+
+@{
+    ViewData["action"] = "Show";
+    ViewData["controller"] = "Cart";
+
+}
+<partial name="_Pagination" view-data="@ViewData" model="@Model">

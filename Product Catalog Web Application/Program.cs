@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Product_Catalog_Web_Application.Data;
-using Product_Catalog_Web_Application.DataLayer;
+using Product_Catalog_Web_Application.DataLayer.Core;
+using Product_Catalog_Web_Application.DataLayer.Services;
 using Product_Catalog_Web_Application.DbContext;
 using Product_Catalog_Web_Application.Models;
 
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<Context>(options =>
 {
+    options.UseLazyLoadingProxies();
     options.UseSqlServer(builder.Configuration.GetConnectionString("cs"));
 });
 
@@ -23,11 +25,14 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.SlidingExpiration = true; 
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30); 
-    options.LoginPath = "/Account/Login";
+    options.LoginPath = "/Account/LoginPage";
 });
 // Make Register For Identity
 builder.Services.AddScoped<IProduct,ProductsRepo>();
 builder.Services.AddScoped<ICategory, CategoryRepo>();
+builder.Services.AddScoped<ICart, CartRepo>();
+builder.Services.AddScoped<ICartDetails, CartDetailsRepo>();
+
 builder.Services.AddScoped<Data_initialization>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {

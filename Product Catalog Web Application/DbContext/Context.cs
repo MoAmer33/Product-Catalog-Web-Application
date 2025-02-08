@@ -36,9 +36,7 @@ namespace Product_Catalog_Web_Application.DbContext
            .WithMany(u => u.Products)
            .HasForeignKey(p => p.UserId);
 
-            //Has Max Length
-            builder.Entity<Products_Cart>().HasKey(p => new { p.productId, p.cartId });
-            builder.Entity<Product_Order>().HasKey(p => new { p.productId,p.orderId });
+          
 
             base.OnModelCreating(builder);
         }

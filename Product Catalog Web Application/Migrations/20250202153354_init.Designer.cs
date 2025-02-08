@@ -12,7 +12,7 @@ using Product_Catalog_Web_Application.DbContext;
 namespace Product_Catalog_Web_Application.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20250128234633_init")]
+    [Migration("20250202153354_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -354,42 +354,53 @@ namespace Product_Catalog_Web_Application.Migrations
 
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product_Order", b =>
                 {
-                    b.Property<string>("productId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("orderId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("productId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("productId", "orderId");
+                    b.Property<double>("unitPrice")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("orderId");
+
+                    b.HasIndex("productId");
 
                     b.ToTable("Product_Order");
                 });
 
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Products_Cart", b =>
                 {
-                    b.Property<string>("productId")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("cartId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("productId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("productId", "cartId");
+                    b.HasKey("Id");
 
                     b.HasIndex("cartId");
+
+                    b.HasIndex("productId");
 
                     b.ToTable("Products_Cart");
                 });
@@ -500,7 +511,7 @@ namespace Product_Catalog_Web_Application.Migrations
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Product_Order", b =>
                 {
                     b.HasOne("Product_Catalog_Web_Application.Models.Order", "order")
-                        .WithMany()
+                        .WithMany("product_Orders")
                         .HasForeignKey("orderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -545,6 +556,11 @@ namespace Product_Catalog_Web_Application.Migrations
             modelBuilder.Entity("Product_Catalog_Web_Application.Models.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Product_Catalog_Web_Application.Models.Order", b =>
+                {
+                    b.Navigation("product_Orders");
                 });
 #pragma warning restore 612, 618
         }

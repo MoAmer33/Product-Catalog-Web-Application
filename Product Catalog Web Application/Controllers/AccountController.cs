@@ -17,47 +17,16 @@ namespace Product_Catalog_Web_Application.Controllers
     public class AccountController : Controller 
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ICategory category;
-        private readonly IProduct product;
         private readonly ILogger<AccountController> _logger;
         private readonly SignInManager<ApplicationUser> signInManager;
-        public AccountController(UserManager<ApplicationUser> userManager,ICategory category,
-            IProduct product, ILogger<AccountController> logger, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager,
+            ILogger<AccountController> logger, SignInManager<ApplicationUser> signInManager)
         {
             this._userManager = userManager;
-            this.category = category;
-            this.product = product;
             this._logger = logger;
             this.signInManager = signInManager;
         }
 
-        public async Task<IActionResult> Show(string CategoryId,int PageNumber=1,int PageSize=3)
-        {
-            ViewBag.Categories = await category.GetAllAsync();
-
-            IEnumerable<Product> products = null;
-
-            //Filter By Category
-            //Get Product in specific Time For Users Not Admin
-            Func<Product, bool> Filter = null;
-            if (CategoryId != null && CategoryId != "ShowAll")
-            {
-                Filter= p => DateTime.Now >= p.StartDate && DateTime.Now <= p.EndDate && p.CategoryId == CategoryId; 
-                products = await product.GetAllWithQueryAsync(Filter, PageNumber,PageSize);
-            }else
-            {
-                Filter = p => DateTime.Now >= p.StartDate && DateTime.Now <= p.EndDate;
-                products = await product.GetAllWithQueryAsync(Filter, PageNumber, PageSize);
-            }
-            var result = new PagedResult<Product>()
-            {
-                Data = products.ToList(),
-                PageNumber = PageNumber,
-                PageSize = PageSize,
-                TotalItems =await product.ItemsCountAsync(Filter)
-            };
-            return View(result);
-        }
         [AllowAnonymous]
         public async Task<IActionResult> Register()
         {
@@ -119,7 +88,7 @@ namespace Product_Catalog_Web_Application.Controllers
                         else 
                         {       
                            await signInManager.SignInWithClaimsAsync(myUser, true, claims);
-                           return RedirectToAction("Show", "Account");
+                           return RedirectToAction("Show", "User");
                         }
                     }
                 }
@@ -128,13 +97,7 @@ namespace Product_Catalog_Web_Application.Controllers
             return View("LoginPage");
         }
 
-        public async Task<IActionResult> Details(string Id)
-        {
-            var ProductFromDb = await product.GetByIdAsync(Id);
-            var Category = await category.GetByIdAsync(ProductFromDb.CategoryId);
-            ViewBag.Category = Category.Name;
-            return View(ProductFromDb);
-        }
+
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();

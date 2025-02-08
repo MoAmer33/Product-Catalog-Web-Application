@@ -8,7 +8,7 @@ namespace Product_Catalog_Web_Application.Models
 
         [ForeignKey("User")]
         public string UserId {  get; set; }
-        public ApplicationUser? User { get; set; }
+        public virtual ApplicationUser? User { get; set; }
         public Cart()
         {
            this.Id = Guid.NewGuid().ToString();

@@ -1,0 +1,92 @@
+﻿@model PagedResult<Product>
+
+
+@{
+    ViewData["Title"] = "Show";
+    SelectList listItems = new SelectList(ViewBag.Categories, "Id", "Name");
+}
+<form method="get" enctype="multipart/form-data">
+    <div class="form-group">
+        <select name="categoryId" asp-items="listItems" class="form-control">
+            <option value="ShowAll">All Categories</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">FilterByCategory</button>
+</form>
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    CreationDate
+                </th>
+                <th>
+                    StartDate
+                </th>
+                <th>
+                    EndDate
+                </th>
+                <th>
+                    Image
+                </th>
+                <th>
+                    duration
+                </th>
+                <th>
+                    Price LE
+                </th>
+                <th>
+                    UserId
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreationDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td>
+                        <img src="~/Images/@item.Image" class="ZoomHover" alt="Not Found" />
+                    </td>
+                    <td>
+                        @(item.EndDate - DateTime.Now)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserId)
+                    </td>
+                    <td>
+                        <a class="btn" style="white-space: nowrap; padding: 10px 20px; background-color: #007bff; color: white; border-radius: 5px;" asp-action="AddToCart" asp-controller="User" asp-route-Id="@item.Id">Add To Cart</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-success" asp-action="Details" asp-controller="User" asp-route-Id="@item.Id">Details</a>
+                    </td>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @{
+        ViewData["action"] = "Show";
+        ViewData["controller"] = "User";
+
+    }
+    <partial name="_Pagination" view-data="@ViewData" model="@Model" />

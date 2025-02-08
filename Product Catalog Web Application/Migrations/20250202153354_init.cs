@@ -230,7 +230,7 @@ namespace Product_Catalog_Web_Application.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -265,14 +265,15 @@ namespace Product_Catalog_Web_Application.Migrations
                 name: "Product_Order",
                 columns: table => new
                 {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     orderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     productId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    quantity = table.Column<int>(type: "int", nullable: false)
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    unitPrice = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product_Order", x => new { x.productId, x.orderId });
+                    table.PrimaryKey("PK_Product_Order", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Product_Order_Orders_orderId",
                         column: x => x.orderId,
@@ -291,14 +292,14 @@ namespace Product_Catalog_Web_Application.Migrations
                 name: "Products_Cart",
                 columns: table => new
                 {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     cartId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     productId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products_Cart", x => new { x.productId, x.cartId });
+                    table.PrimaryKey("PK_Products_Cart", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Products_Cart_Carts_cartId",
                         column: x => x.cartId,
@@ -373,6 +374,11 @@ namespace Product_Catalog_Web_Application.Migrations
                 column: "orderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Product_Order_productId",
+                table: "Product_Order",
+                column: "productId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 table: "Products",
                 column: "CategoryId");
@@ -386,6 +392,11 @@ namespace Product_Catalog_Web_Application.Migrations
                 name: "IX_Products_Cart_cartId",
                 table: "Products_Cart",
                 column: "cartId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_Cart_productId",
+                table: "Products_Cart",
+                column: "productId");
         }
 
         /// <inheritdoc />

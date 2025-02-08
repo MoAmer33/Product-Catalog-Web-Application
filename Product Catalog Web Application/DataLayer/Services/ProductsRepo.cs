@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Product_Catalog_Web_Application.DataLayer.Core;
 using Product_Catalog_Web_Application.DbContext;
 using Product_Catalog_Web_Application.Models;
 
-namespace Product_Catalog_Web_Application.DataLayer
+namespace Product_Catalog_Web_Application.DataLayer.Services
 {
     //Create Repository for Data Layer 
     public class ProductsRepo : IProduct
@@ -11,16 +12,16 @@ namespace Product_Catalog_Web_Application.DataLayer
 
         public ProductsRepo(Context _context)
         {
-            this.context=_context;
+            context = _context;
         }
         public async Task CreateAsync(Product entity)
         {
-             context.Products.Add(entity);
+            context.Products.Add(entity);
         }
 
         public async Task DeleteAsync(string id)
         {
-            var product=await GetByIdAsync(id);
+            var product = await GetByIdAsync(id);
             context.Remove(product);
         }
 
@@ -33,7 +34,7 @@ namespace Product_Catalog_Web_Application.DataLayer
         {
             if (func == null)
             {
-                return context.Products.AsNoTracking().Skip((PageNumber-1)*PageSize).Take(PageSize).ToList();
+                return context.Products.AsNoTracking().Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
             }
             return context.Products.AsNoTracking().Where(func).Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
         }
@@ -43,11 +44,11 @@ namespace Product_Catalog_Web_Application.DataLayer
 
         public async Task<Product> GetByIdAsync(string id)
         {
-            return context.Products.AsNoTracking().FirstOrDefault(p => p.Id == id);
+            return context.Products.FirstOrDefault(p => p.Id == id);
         }
         public async Task<Product> GetSpecificAsync(Func<Product, bool> func)
         {
-            return context.Products.AsNoTracking().FirstOrDefault(func);
+            return context.Products.FirstOrDefault(func);
         }
 
         public async Task SavaAsync()
@@ -66,10 +67,10 @@ namespace Product_Catalog_Web_Application.DataLayer
 
         public async Task UpdateAsync(Product product)
         {
-           
+
             context.Products.Update(product);
         }
 
-       
+
     }
 }

@@ -23,13 +23,21 @@
                         @if (@User.Identity.IsAuthenticated==true)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Show">UserProduct</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Show">UserProduct</a>
                             </li>
+            
+                           
                             @if (@User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Show">AdminProducts</a>
                                 </li>
+                            }
+                            else
+                            {
+                                 <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Show">Cart</a>
+                                 </li>
                             }
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout Welcome @User.Identity.Name</a>

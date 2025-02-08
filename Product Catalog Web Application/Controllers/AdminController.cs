@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Product_Catalog_Web_Application.DataLayer;
 using Product_Catalog_Web_Application.Models;
 using Product_Catalog_Web_Application.ViewModel;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using cloudscribe.Pagination.Models;
 using System.Linq;
+using Product_Catalog_Web_Application.DataLayer.Core;
 
 namespace Product_Catalog_Web_Application.Controllers
 {

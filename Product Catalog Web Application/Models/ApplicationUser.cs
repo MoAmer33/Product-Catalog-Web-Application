@@ -5,7 +5,7 @@ namespace Product_Catalog_Web_Application.Models
 {
     public class ApplicationUser:IdentityUser
     {
-       public List<Product>? Products { get; set; }
-       public List<Order>? Orders { get; set; }
+       public virtual List<Product>? Products { get; set; }
+       public virtual List<Order>? Orders { get; set; }
     }
 }

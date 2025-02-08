@@ -22,7 +22,7 @@ namespace Product_Catalog_Web_Application.Models
         public int amount { get; set; }
         [ForeignKey("order")]
         public string orderId { get; set; }
-        public Order? order { get; set; }
+        public virtual Order? order { get; set; }
 
         public PaymentDetails() 
         {

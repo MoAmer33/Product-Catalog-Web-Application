@@ -21,8 +21,8 @@ namespace Product_Catalog_Web_Application.Helper
             //And Accept .jpg, .jpeg, .png, .JPG, .JPEG, .PNG" in Html input
             var Extensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "jpg", "jpeg", "png" };
             string ErrorMessage = "Should Upload Image and Length Of File Should Be less or Equal than 1MB And jpg, jpeg, png Extension";
-            if (newProduct.ImageName == null&&newProduct.Image!=null||
-                newProduct.ImageName != null && newProduct.Image != null)
+            if (newProduct.ImageName == null&&newProduct.Image!=null||//New Image Product
+                newProduct.ImageName != null && newProduct.Image != null)//Edit Image Product
             {
                  var split = newProduct.Image.FileName.Split('.')[1];
                 if (newProduct.Image.Length <= 1 * 1024 * 1024 && Extensions.Contains(split))
@@ -42,7 +42,7 @@ namespace Product_Catalog_Web_Application.Helper
                 return new { Check = "false", ErrorMessage = ErrorMessage };
 
             }
-            else if(newProduct.ImageName != null && newProduct.Image == null)
+            else if(newProduct.ImageName != null && newProduct.Image == null)//Image not changed in Edit
             {
                 return new { Check = "true", UniqueImageName = newProduct.ImageName };
             }
